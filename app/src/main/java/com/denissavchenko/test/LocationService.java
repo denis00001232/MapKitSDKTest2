@@ -28,10 +28,6 @@ public class LocationService extends Service {
     Handler mainHandler;
     FusedLocationProviderClient fusedLocationProviderClient;
 
-    public LocationService() {
-
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
@@ -48,7 +44,6 @@ public class LocationService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-
     public void makeLoopWithNotification() {
         Thread thread = new Thread(() -> {
             while (true) {
@@ -64,6 +59,7 @@ public class LocationService extends Service {
         });
         thread.start();
     }
+
     //Находим место, ставим на это место надпись, направляем на это место камеру
     @SuppressLint("MissingPermission")
     public void findLocation() {
@@ -71,13 +67,19 @@ public class LocationService extends Service {
             @Override
             public void onSuccess(Location location) {
                 Point point = new Point(location.getLatitude(), location.getLongitude());
-                if (placemark != null) placemark.setGeometry(point);
-                else {
+                if (placemark != null) {
+                    if (placemark.isValid()) {
+                        placemark.setGeometry(point);
+                    } else {
+                        placemark = null;
+                    }
+                }
+                if (placemark == null) {
                     placemark = MainActivity.getMapView().getMap().getMapObjects().addPlacemark();
                     placemark.setGeometry(point);
                     placemark.setText("Я здесь");
                 }
-                MainActivity.getMapView().getMap().move(new CameraPosition(point, 18, 0,0), new Animation(Animation.Type.SMOOTH, 1), null);
+                MainActivity.getMapView().getMap().move(new CameraPosition(point, 18, 0, 0), new Animation(Animation.Type.SMOOTH, 1), null);
                 Toast.makeText(getApplicationContext(), "Ваши координаты: " + location.getLatitude() + " " + location.getLongitude(), Toast.LENGTH_SHORT).show();
             }
         });
