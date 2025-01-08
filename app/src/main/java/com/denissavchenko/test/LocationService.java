@@ -64,7 +64,7 @@ public class LocationService extends Service {
         });
         thread.start();
     }
-    //Находим место, ставим на это место надпись
+    //Находим место, ставим на это место надпись, направляем на это место камеру
     @SuppressLint("MissingPermission")
     public void findLocation() {
         fusedLocationProviderClient.getCurrentLocation(LocationRequest.QUALITY_HIGH_ACCURACY, new CancellationTokenSource().getToken()).addOnSuccessListener(new OnSuccessListener<Location>() {
